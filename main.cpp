@@ -13,7 +13,7 @@ using namespace std;
 
 // function prototypes
 void insert(int* &tree, int treeSize, int i);
-void print(int* tree, int treeSize);
+void print(int* tree, int* &tempTree, int treeSize, int numValues, int &i);
 
 int main()
 {
@@ -24,6 +24,7 @@ int main()
   // tree
   int treeSize = 101;
   int* tree = new int[treeSize];
+  int insertIndex = 0; // records where to insert a new value
   tree[0] = 0; // we will not be using the 0 index
   
   while (editing)
@@ -33,6 +34,7 @@ int main()
       cout << "This is a max heap program that takes in 100 integers." << endl;
       cout << "If you would like to enter your numbers manually, type 'manual.'" << endl;
       cout << "If you would like to generate numbers from a file, type 'file.'" << endl;
+      cout << "if you would like to print your tree, type 'print." << endl;
       cout << "If you would like to quit the program, type 'quit.'" << endl;
 
       // receiving input
@@ -48,7 +50,7 @@ int main()
 	  bool wantToQuit = false;
 
 	  // records index where the new value is added;
-	  int insertIndex = 1;
+	  insertIndex = 1;
 	  
 	  while ((count < treeSize - 1) && !wantToQuit)
 	    {
@@ -70,6 +72,12 @@ int main()
 
 	      count++;
 	    }
+	}
+      else if (strcmp(input, "print") == 0)
+	{
+	  int* tempTree = new int[insertIndex];
+	  int tempIndex = 0;
+	  print(tree, tempTree, treeSize, insertIndex, tempIndex);
 	}
       else if (strcmp(input, "quit") == 0)
 	{
@@ -102,7 +110,10 @@ void insert(int* &tree, int treeSize,  int i)
       // move up one generation
       i /= 2;
       insert(tree, treeSize, i);
-      print(tree, treeSize);
+
+      int tempIndex = 0;
+      int* tempTree = new int[treeSize];
+      // print(tree, tempTree, treeSize, tempIndex);
     }
   else
     {
@@ -114,10 +125,11 @@ void insert(int* &tree, int treeSize,  int i)
 
 }
 
-void print(int* tree, int treeSize/* int i*/)
+void print(int* tree, int* &tempTree, int treeSize, int numValues,  int &i)
 {
   for (int j = 0; j < treeSize - 1; j++)
     {
+      tempTree[j] = 0;
       if (tree[j] != 0)
 	{
 	  cout << tree[j] << endl;
@@ -126,10 +138,28 @@ void print(int* tree, int treeSize/* int i*/)
 
   cout << "" << endl;
 
-  // print rightmost child (last slot in array first
-  // print the parent
-  // print left child
-  // find the grandparent, if there is one, print it
-  // then print everything in the left child
+  cout << "inside print function." << endl;
+  // create a new printable array, equal to the number of values + 1
+  // starting index i = 0
+  int x = 0; // this is the index of our new array
+  if (i == 0)
+    {
+      cout << "i = 0." << endl;
+      // we must insert the root into the middle of the array
+      x = i + (numValues - i)/2; // right now i = 0
+      tempTree[x] = tree[i + 1];
+      i = x;
+      cout << "number " << tempTree[x] << " inserted at " << i << endl;
+      print (tree, tempTree, treeSize, numValues, i);
+    }
+  else
+    {
+      // if both children = 0; we've reached the bottom
+    }
+  // if both children = 0, we've reached the bottom, print
+  // if the children are not equal to 0
+  // start with the left child, put it at index i - (size - i)/2
+  // then do the right child, put it at index i + (size - i)/2
+
   
 }
