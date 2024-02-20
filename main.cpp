@@ -13,7 +13,8 @@ using namespace std;
 
 // function prototypes
 void insert(int* &tree, int treeSize, int i);
-void print(int* tree, int* &tempTree, int treeSize, int numValues, int &i);
+//void print(int* tree, int* &tempTree, int treeSize, int numValues, int &i);
+void print(int* tree, int i, int numTabs);
 
 int main()
 {
@@ -77,7 +78,8 @@ int main()
 	{
 	  int* tempTree = new int[insertIndex];
 	  int tempIndex = 0;
-	  print(tree, tempTree, treeSize, insertIndex, tempIndex);
+	  //print(tree, tempTree, treeSize, insertIndex, tempIndex);
+	  print(tree, 1, 0);
 	}
       else if (strcmp(input, "quit") == 0)
 	{
@@ -125,6 +127,8 @@ void insert(int* &tree, int treeSize,  int i)
 
 }
 
+
+/*
 void print(int* tree, int* &tempTree, int treeSize, int numValues,  int &i)
 {
   for (int j = 0; j < treeSize - 1; j++)
@@ -154,12 +158,62 @@ void print(int* tree, int* &tempTree, int treeSize, int numValues,  int &i)
     }
   else
     {
-      // if both children = 0; we've reached the bottom
+      // if both children = 0; we've reached a leaf
+      if (tree[2 * i] == 0 && tree[2 * i + 1] == 0)
+	{
+	  cout << "we've reached a leaf at value " << tree[i] <<  endl;
+	}
+      else
+	{
+	  if (tree[2 * i] != 
+	}
     }
   // if both children = 0, we've reached the bottom, print
   // if the children are not equal to 0
   // start with the left child, put it at index i - (size - i)/2
   // then do the right child, put it at index i + (size - i)/2
+
+  
+}
+*/
+
+/**
+ * This function creates a visual representation of the max heap. 
+ * @param tree | this is the max heap structure
+ * @param i | this is the current index we are working with
+ * @param numTabs | this will keep track of how many indents to make
+ */
+void print(int* tree, int i, int numTabs)
+{
+  if (tree[i] == 0)
+    {
+      return; // there is nothing in the table, or we've reached a leaf
+    }
+
+  // else if the tree is not empty
+  numTabs += 1; // indent one more in
+
+  // recursively move down by moving to the right child each time
+  print(tree, (2 * i + 1), numTabs);
+
+  // IMPORTANT NOTE!
+  // once we reach the last child (the leaf), we can no longer move down
+  // to another child. This means that when we call the print function
+  // from above, the parameter (2 * i + 1) = 0. Thus, we jump into the
+  // if statement several lines above and return, exiting the print function.
+  // however, since we had called print recursively, when we
+  // jump out of print(tree, (2 * i + 1), numTabs), we end up on the line below
+
+  cout << endl;
+  for (int i = 1; i < numTabs; i++)
+    {
+      // indent the number of times as stated by numTabs
+      cout << "\t";
+    }
+  cout << tree[i] << "\n"; // print value here
+
+  print(tree, (2 * i), numTabs); // same idea for the left child
+  
 
   
 }
