@@ -16,7 +16,7 @@ using namespace std;
 // function prototypes
 void insert(int* &tree, int treeSize, int i);
 void print(int* tree, int i, int numTabs);
-void remove(int* &tree, int treeSize, int i, int &insertIndex);
+void remove(int* &tree, int i);
 
 int main()
 {
@@ -85,6 +85,7 @@ int main()
 		      cout << "You've added " << insertIndex << " numbers" << endl;
 		      insertIndex++;
 
+		      cout << "New tree: " << endl;
 		      print(tree, 1, 0); // visualize the current tree
 		      cout << "" << endl;
 
@@ -96,25 +97,49 @@ int main()
 	}
       else if (strcmp(input, "remove") == 0)
 	{
-	  cout << "removing root" << endl;
+	  cout << "Removing root..." << endl;
 
 	  // temporary variable that stores our position moving thru the tree
 	  int rootIndex = 1;
 
-	  insertIndex -= 1;
+	  insertIndex--;
 
 	  // remove the current root, put the rightmost leaf as the root
 	  tree[rootIndex] = tree[insertIndex];
 	  tree[insertIndex] = 0;
 
 	  // reorganize the tree back to a max heap
-	  remove(tree, treeSize, rootIndex, insertIndex);
+	  remove(tree, rootIndex);
+	  cout << "New tree: " << endl;
 	  print(tree, 1, 0);
 	  cout << "" << endl;
 	}
       else if (strcmp(input, "remove all") == 0)
 	{
-	  cout << "removing all" << endl;
+	  cout << "Removing all values..." << endl;
+
+	  // basically call remove repeatedly until insertIndex = 1
+	  while (insertIndex != 1)
+	    {
+	      // temporary variable   
+	      int rootIndex = 1;
+
+	      insertIndex--;
+
+	      // remove the current root, put the rightmost leaf as the root        
+	      tree[rootIndex] = tree[insertIndex];
+	      tree[insertIndex] = 0;
+
+	      // reorganize the tree back to a max heap                             
+	      remove(tree, rootIndex);
+
+	      cout << "Root removed. New tree: " << endl;
+	      print(tree, 1, 0);
+	      cout << "" << endl;
+	    }
+
+	  cout << "Removal process complete. Your max heap is now clear." << endl;
+	  cout << "" << endl;
 	}
       else if (strcmp(input, "print") == 0)
 	{
@@ -161,17 +186,8 @@ void insert(int* &tree, int treeSize,  int i)
 
 }
 
-void remove(int* &tree, int treeSize, int i, int &insertIndex)
+void remove(int* &tree, int i)
 {
-  // start off with i = 1 (the root)
-  // cout << "root: " << i << endl;
-  // tree[i] = tree[insertIndex];
-  // tree[insertIndex] = 0;
-
-  // how to delete that slot in the array?
-  
-  // insertIndex -= 1; // the table is one slot smaller now
-
   if (tree[i] != 0)
     {
       // check the children and swap with the larger one
@@ -185,7 +201,7 @@ void remove(int* &tree, int treeSize, int i, int &insertIndex)
 	tree[2 * i] = tree[i];
 	tree[i] = temp;
 	//i *= 2; // move to the child's position
-	remove(tree, treeSize, (i * 2), insertIndex);
+	remove(tree, (i * 2));
       }
       else if (tree[2 * i + 1] != 0 &&
 	  tree[i] < tree[2 * i + 1] &&
@@ -197,7 +213,7 @@ void remove(int* &tree, int treeSize, int i, int &insertIndex)
 	tree[2 * i + 1] = tree[i];
 	tree[i] = temp;
 	//i = i * 2 + 1; // move to the child's position                                     
-	remove(tree, treeSize, (i * 2 + 1), insertIndex);
+	remove(tree, (i * 2 + 1));
       }
     }
 }
