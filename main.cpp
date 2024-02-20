@@ -9,12 +9,14 @@ using namespace std;
  * largest, and its children get progressively smaller. 
  * Sources | 
  * https://www.geeksforgeeks.org/heap-data-structure/
+ * https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
+ * https://www.geeksforgeeks.org/return-statement-in-cpp-with-examples/
  */
 
 // function prototypes
 void insert(int* &tree, int treeSize, int i);
-//void print(int* tree, int* &tempTree, int treeSize, int numValues, int &i);
 void print(int* tree, int i, int numTabs);
+void remove(int* &tree, int treeSize, int i, int &insertIndex);
 
 int main()
 {
@@ -25,61 +27,100 @@ int main()
   // tree
   int treeSize = 101;
   int* tree = new int[treeSize];
-  int insertIndex = 0; // records where to insert a new value
   tree[0] = 0; // we will not be using the 0 index
+
+  // manual addition
+  int insertIndex = 1; // records where to insert a new value
+  int count = 0; // makes sure only 100 numbers are added
   
   while (editing)
     {
       // instructions
       cout << "Please only use lowercase letters." << endl;
       cout << "This is a max heap program that takes in 100 integers." << endl;
-      cout << "If you would like to enter your numbers manually, type 'manual.'" << endl;
-      cout << "If you would like to generate numbers from a file, type 'file.'" << endl;
-      cout << "if you would like to print your tree, type 'print." << endl;
+      cout << "If you would like to add to your tree, type 'add.'" << endl;
+      cout << "If you would like to remove the root, type 'remove.'" << endl;
+      cout << "If you would like to remove all values, type 'remove all.'" << endl;
+      cout << "if you would like to print your tree, type 'print.'" << endl;
       cout << "If you would like to quit the program, type 'quit.'" << endl;
 
       // receiving input
       cin.getline(input, max);
-      if (strcmp(input, "file") == 0)
+      if (strcmp(input, "add") == 0)
 	{
-	  // read in from a file
-	}
-      else if (strcmp(input, "manual") == 0)
-	{
-	  // manual read-in
-	  int count = 0;
-	  bool wantToQuit = false;
-
-	  // records index where the new value is added;
-	  insertIndex = 1;
-	  
-	  while ((count < treeSize - 1) && !wantToQuit)
+	  cout << "If you would like to enter numbers manual, type 'manual.'" << endl;
+	  cout << "If you would like to enter numbers through a file, type 'file.'" << endl;
+	  cin.getline(input, max);
+	  if (strcmp(input, "file") == 0)
 	    {
-	      int newnum = 0;
-	      cout << "If you want to stop adding numbers, enter '-1', otherwise, please enter number " << insertIndex  << ": " << endl;
-	      cin >> newnum;
-	      cin.ignore(max, '\n');
-	      if (newnum == -1)
-		{
-		  wantToQuit = true;
-		}
-	      else
-		{
-		  tree[insertIndex] = newnum;
-		  insert(tree, treeSize, insertIndex);
-		  insertIndex++;
-		  cout << "now we are on slot " << insertIndex << endl;
-		}
-
-	      count++;
+	      // read in from a file
 	    }
+	  else if (strcmp(input, "manual") == 0)
+	    {
+	      // manual read-in
+	      //	  int count = 0;
+	      bool wantToQuit = false;
+
+	      // records index where the new value is added;
+	      // insertIndex = 1;
+
+	      while ((count < treeSize - 1) && !wantToQuit)
+		{
+		  int newnum = 0;
+		  cout << "If you want to stop adding numbers, enter '-1', otherwise, please enter a positive integer greater than 0"  << endl;
+		  cin >> newnum;
+		  cin.ignore(max, '\n');
+		  if (newnum == -1)
+		    {
+		      wantToQuit = true;
+		    }
+		  else if (newnum <= 0)
+		    {
+		      cout << "Please enter a positive integer greater than 0." << endl;
+		    }
+		  else if (newnum >= 0)
+		    {
+		      tree[insertIndex] = newnum;
+		      insert(tree, treeSize, insertIndex);
+		      cout << "You've added " << insertIndex << " numbers" << endl;
+		      insertIndex++;
+
+		      print(tree, 1, 0); // visualize the current tree
+		      cout << "" << endl;
+
+		      count++;
+		    }
+
+		}
+	    }
+	}
+      else if (strcmp(input, "remove") == 0)
+	{
+	  cout << "removing root" << endl;
+
+	  // temporary variable that stores our position moving thru the tree
+	  int rootIndex = 1;
+
+	  insertIndex -= 1;
+
+	  // remove the current root, put the rightmost leaf as the root
+	  tree[rootIndex] = tree[insertIndex];
+	  tree[insertIndex] = 0;
+
+	  // reorganize the tree back to a max heap
+	  remove(tree, treeSize, rootIndex, insertIndex);
+	  print(tree, 1, 0);
+	  cout << "" << endl;
+	}
+      else if (strcmp(input, "remove all") == 0)
+	{
+	  cout << "removing all" << endl;
 	}
       else if (strcmp(input, "print") == 0)
 	{
-	  int* tempTree = new int[insertIndex];
-	  int tempIndex = 0;
-	  //print(tree, tempTree, treeSize, insertIndex, tempIndex);
+	  // print the table, starting from index 1, # of indents starts at 0
 	  print(tree, 1, 0);
+	  cout << "" << endl;
 	}
       else if (strcmp(input, "quit") == 0)
 	{
@@ -89,7 +130,7 @@ int main()
 return 0;
 }
 
-/*
+/**
  * This function adds the data value into your max heap
  * @param tree | this is the heap
  * @param data | the value being entered
@@ -104,7 +145,6 @@ void insert(int* &tree, int treeSize,  int i)
   if (parent !=0 && parent < tree[i])
     {
       // swap parent with child
-      cout << "a swap is necessary" << endl;
       int temp = parent;
       tree[(int)(i/2)] = tree[i];
       tree[i] = temp;
@@ -113,69 +153,54 @@ void insert(int* &tree, int treeSize,  int i)
       i /= 2;
       insert(tree, treeSize, i);
 
-      int tempIndex = 0;
-      int* tempTree = new int[treeSize];
-      // print(tree, tempTree, treeSize, tempIndex);
     }
   else
     {
       cout << "we are here." << endl;
     }
 
-  // if so, swap indices with the parent, call add again
-  // else if parent > current, stop and stay at the index you are at
-
 }
 
-
-/*
-void print(int* tree, int* &tempTree, int treeSize, int numValues,  int &i)
+void remove(int* &tree, int treeSize, int i, int &insertIndex)
 {
-  for (int j = 0; j < treeSize - 1; j++)
-    {
-      tempTree[j] = 0;
-      if (tree[j] != 0)
-	{
-	  cout << tree[j] << endl;
-	}
-    }
+  // start off with i = 1 (the root)
+  // cout << "root: " << i << endl;
+  // tree[i] = tree[insertIndex];
+  // tree[insertIndex] = 0;
 
-  cout << "" << endl;
-
-  cout << "inside print function." << endl;
-  // create a new printable array, equal to the number of values + 1
-  // starting index i = 0
-  int x = 0; // this is the index of our new array
-  if (i == 0)
-    {
-      cout << "i = 0." << endl;
-      // we must insert the root into the middle of the array
-      x = i + (numValues - i)/2; // right now i = 0
-      tempTree[x] = tree[i + 1];
-      i = x;
-      cout << "number " << tempTree[x] << " inserted at " << i << endl;
-      print (tree, tempTree, treeSize, numValues, i);
-    }
-  else
-    {
-      // if both children = 0; we've reached a leaf
-      if (tree[2 * i] == 0 && tree[2 * i + 1] == 0)
-	{
-	  cout << "we've reached a leaf at value " << tree[i] <<  endl;
-	}
-      else
-	{
-	  if (tree[2 * i] != 
-	}
-    }
-  // if both children = 0, we've reached the bottom, print
-  // if the children are not equal to 0
-  // start with the left child, put it at index i - (size - i)/2
-  // then do the right child, put it at index i + (size - i)/2
-
+  // how to delete that slot in the array?
   
+  // insertIndex -= 1; // the table is one slot smaller now
+
+  if (tree[i] != 0)
+    {
+      // check the children and swap with the larger one
+      if (tree[2 * i] != 0 &&
+	  tree[i] < tree[2 * i] &&
+	  tree[2 * i] > tree[2 * i + 1])
+      {
+	// the left child is larger than the parent and the right child
+	// swap the parent and the left child
+	int temp = tree[2 * i];
+	tree[2 * i] = tree[i];
+	tree[i] = temp;
+	//i *= 2; // move to the child's position
+	remove(tree, treeSize, (i * 2), insertIndex);
+      }
+      else if (tree[2 * i + 1] != 0 &&
+	  tree[i] < tree[2 * i + 1] &&
+	  tree[2 * i + 1] > tree[2 * i])
+      {
+	// the left child is larger than the parent and the right child             
+	// swap the parent and the left child                                       
+	int temp = tree[2 * i + 1];
+	tree[2 * i + 1] = tree[i];
+	tree[i] = temp;
+	//i = i * 2 + 1; // move to the child's position                                     
+	remove(tree, treeSize, (i * 2 + 1), insertIndex);
+      }
+    }
 }
-*/
 
 /**
  * This function creates a visual representation of the max heap. 
